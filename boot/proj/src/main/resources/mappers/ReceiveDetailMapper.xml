@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="com.example.mapper.ReceiveDetailMapper">
+	<select id="search" resultType="ReceiveDetailDTO">
+		select SUBSTR(a.income_date, 1, 10) as income_date, b.item_name, c.vendor_name, b.item_division, a.item_income_price, a.income_inqty, (a.item_income_price * a.income_inqty) as income_total_price, b.item_code
+		from erp_pharmacy.income as a inner join erp_pharmacy.item as b on a.item_code = b.item_code inner join erp_pharmacy.vendor as c on a.vendor_code = c.vendor_code 
+		where SUBSTR(a.income_date, 1, 10) between #{startDate} and #{endDate};
+	</select>
+	<select id="searchVendor" resultType="ReceiveDetailDTO">
+		select SUBSTR(a.income_date, 1, 10) as income_date, b.item_name, c.vendor_name, b.item_division, a.item_income_price, a.income_inqty, (a.item_income_price * a.income_inqty) as income_total_price, b.item_code
+		from erp_pharmacy.income as a inner join erp_pharmacy.item as b on a.item_code = b.item_code inner join erp_pharmacy.vendor as c on a.vendor_code = c.vendor_code 
+		where SUBSTR(a.income_date, 1, 10) between #{startDate} and #{endDate} and c.vendor_name = #{vendor_name};
+	</select>
+	<select id="searchItem" resultType="ReceiveDetailDTO">
+		select SUBSTR(a.income_date, 1, 10) as income_date, b.item_name, c.vendor_name, b.item_division, a.item_income_price, a.income_inqty, (a.item_income_price * a.income_inqty) as income_total_price, b.item_code
+		from erp_pharmacy.income as a inner join erp_pharmacy.item as b on a.item_code = b.item_code inner join erp_pharmacy.vendor as c on a.vendor_code = c.vendor_code 
+		where SUBSTR(a.income_date, 1, 10) between #{startDate} and #{endDate} and b.item_name like CONCAT(#{item_name},'%');
+	</select>
+	<select id="searchAll" resultType="ReceiveDetailDTO">
+		select SUBSTR(a.income_date, 1, 10) as income_date, b.item_name, c.vendor_name, b.item_division, a.item_income_price, a.income_inqty, (a.item_income_price * a.income_inqty) as income_total_price, b.item_code
+		from erp_pharmacy.income as a inner join erp_pharmacy.item as b on a.item_code = b.item_code inner join erp_pharmacy.vendor as c on a.vendor_code = c.vendor_code 
+		where SUBSTR(a.income_date, 1, 10) between #{startDate} and #{endDate} and c.vendor_name = #{vendor_name} and b.item_name like CONCAT(#{item_name},'%');
+	</select>
+	
+ 	<update id="updateData" parameterType="int">
+ 		update erp_pharmacy.income set income_inqty=#{income_inqty}, item_income_price=#{item_income_price} where item_code=#{item_code}
+ 	</update>
+ 	
+ 	<delete id="deleteData" parameterType="int">
+ 		delete from erp_pharmacy.income where item_code = #{deleteCode}
+ 	</delete>
+ 	
+ 	<delete id="deleteAll" parameterType="int">
+ 		delete from erp_pharmacy.income
+ 	</delete>
+</mapper>

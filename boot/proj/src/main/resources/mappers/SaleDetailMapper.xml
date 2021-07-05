@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.example.mapper.SaleDetailMapper">
+	<!-- 판매  -->
+	<!-- 판매 페이지에서 테이블 데이터 sale DB로 Insert -->
+    <insert id="insertSaleData" parameterType="java.util.List">
+ 			insert into erp_pharmacy.sale(sale_code, sale_group_code, item_code, item_name, item_quantity, item_sale_price, sale_date) values
+		<foreach collection="list" item="item" separator=",">
+ 			(#{item.sale_code}, #{item.sale_group_code}, #{item.item_code}, #{item.item_name}, #{item.item_quantity}, #{item.item_sale_price}, #{item.sale_date})
+ 		</foreach>
+ 	</insert>
+ 	<!-- 판매 마지막 세일코드 받기 -->
+ 	<select id="readIdx" resultType="int">
+ 		select max(sale_code) from erp_pharmacy.sale;
+ 	</select>
+ 	
+ 	
+ 	<!-- 판매 상세 페이지  -->
+ 	<!-- 테이블 CRUD -->
+ 	<select id="searchDate" resultType="saleDetailDTO">
+		select SUBSTR(a.sale_date, 1, 10) as sale_date, a.sale_code, a.item_code, a.item_name, a.item_quantity, a.item_sale_price, (a.item_quantity * a.item_sale_price) as total_price,
+		b.made_company, b.item_division, b.main_ingrd, b.item_category, b.permit
+		from erp_pharmacy.sale a, erp_pharmacy.item b
+		where a.sale_date between #{startDate} and #{endDate} and a.item_code = b.item_code
+ 	</select>
+ 	
+ 	<update id="updateData" parameterType="int">
+ 		update erp_pharmacy.sale set item_quantity=#{item_quantity}, item_sale_price=#{item_sale_price} where item_code=#{item_code}
+ 	</update>
+ 	
+ 	<delete id="deleteData" parameterType="int">
+ 		delete from erp_pharmacy.sale where item_code = #{deleteCode}
+ 	</delete>
+ 	
+ 	<delete id="deleteAll" parameterType="int">
+ 		delete from erp_pharmacy.sale
+ 	</delete>
+</mapper>        
+
+       

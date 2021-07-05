@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="com.example.mapper.RevenueGraphMapper">
+ 	<!-- 그래프 페이지 -->
+ 	<!-- 일/월별 총판매금액 & 총입고금액(원가) -->
+ 	<select id="dayTotal" resultType="RevenueGraphDTO">
+ 		select DATE_FORMAT(sale_date,'%d') as day, sale.total_price, income.income_total_price from 
+		(SELECT sale_date, sum(item_sale_price * item_quantity) as total_price from erp_pharmacy.sale group by DATE_FORMAT(sale_date,'%d')) as sale inner join
+		(SELECT income_date, sum(income_inqty * item_income_price) as income_total_price from erp_pharmacy.income group by DATE_FORMAT(income_date,'%d')) as income on income.income_date = sale.sale_date;
+ 	</select>
+ 	
+ 	<select id="monthTotal" resultType="RevenueGraphDTO">
+ 		select DATE_FORMAT(sale_date,'%m') as month, sale.total_price, income.income_total_price from 
+		(SELECT sale_date, sum(item_sale_price * item_quantity) as total_price from erp_pharmacy.sale group by DATE_FORMAT(sale_date,'%m')) as sale inner join
+		(SELECT income_date, sum(income_inqty * item_income_price) as income_total_price from erp_pharmacy.income group by DATE_FORMAT(income_date,'%m')) as income on income.income_date = sale.sale_date;
+ 	</select>
+ 		
+ 	<!-- 월별 판매수익(월 총판매금액 - 월 총입고금액) 그래프 (+없는건 0으로 리턴) -->
+ 	<select id="filterData" resultType="int">
+		select IFNULL(MAX(
+		(SELECT sum(item_sale_price * item_quantity) as total_price from erp_pharmacy.sale group by DATE_FORMAT(sale_date,'%m'))
+		-
+		(SELECT sum(income_inqty * item_income_price) as income_total_price from erp_pharmacy.income group by DATE_FORMAT(income_date,'%m'))
+		), 0) as revenue
+		from erp_pharmacy.sale, erp_pharmacy.income where DATE_FORMAT(sale_date,'%m') like CONCAT('%', #{filterCode}, '%');
+ 	</select>
+</mapper>
